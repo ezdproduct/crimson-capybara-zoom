@@ -179,7 +179,7 @@ const CheckinPage = () => {
   };
 
   const renderUserSearch = () => {
-    if (isLoadingUsers) return <Skeleton className="h-12 w-full" />;
+    if (isLoadingUsers) return <Skeleton className="h-10 w-full" />;
     if (isFetchError) return (
       <Alert variant="destructive">
         <Terminal className="h-4 w-4" />
@@ -191,14 +191,14 @@ const CheckinPage = () => {
     return (
       <Popover open={isComboboxOpen} onOpenChange={handlePopoverOpenChange}>
         <PopoverTrigger asChild>
-          <Button variant="outline" role="combobox" className="w-full justify-between text-lg h-12">
+          <Button variant="outline" role="combobox" className="w-full justify-between h-11">
             {selectedUser ? selectedUser.name : "Mời nhập tên"}
-            <ChevronsUpDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent side="bottom" sideOffset={8} className="w-[--radix-popover-trigger-width] p-0">
           <Command filter={() => 1}>
-            <CommandInput placeholder="Tìm tên Đại biểu..." value={searchValue} onValueChange={setSearchValue} className="h-12 text-lg" />
+            <CommandInput placeholder="Tìm tên Đại biểu..." value={searchValue} onValueChange={setSearchValue} />
             <CommandList>
               <CommandEmpty />
               
@@ -209,8 +209,8 @@ const CheckinPage = () => {
               }).map(letter => (
                 <CommandGroup heading={letter} key={letter}>
                   {groupedNotCheckedInUsers[letter].map(user => (
-                    <CommandItem key={user.id} value={user.name} onSelect={() => handleUserSelect(user)} className="text-lg py-3">
-                      <Check className={cn("mr-3 h-5 w-5", selectedUser?.name === user.name ? "opacity-100" : "opacity-0")} />
+                    <CommandItem key={user.id} value={user.name} onSelect={() => handleUserSelect(user)}>
+                      <Check className={cn("mr-2 h-4 w-4", selectedUser?.name === user.name ? "opacity-100" : "opacity-0")} />
                       {renderName(user.name)}
                     </CommandItem>
                   ))}
@@ -220,8 +220,8 @@ const CheckinPage = () => {
               {checkedInUsers.length > 0 && (
                 <CommandGroup heading="Đã Điểm Danh">
                   {checkedInUsers.map(user => (
-                    <CommandItem key={user.id} value={user.name} disabled={true} className="text-muted-foreground text-lg py-3">
-                      <Check className="mr-3 h-5 w-5" />
+                    <CommandItem key={user.id} value={user.name} disabled={true} className="text-muted-foreground">
+                      <Check className="mr-2 h-4 w-4" />
                       {renderName(user.name)}
                     </CommandItem>
                   ))}
@@ -240,8 +240,8 @@ const CheckinPage = () => {
       <div className={cn("w-full px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out", isFormActive ? "pt-16 md:pt-24" : "pt-[30vh]")}>
         <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">
           <CardHeader>
-            <CardTitle className="text-3xl">Điểm Danh</CardTitle>
-            <CardDescription className="text-lg pt-1">Nhập tên Đại biểu</CardDescription>
+            <CardTitle className="text-2xl">Điểm Danh</CardTitle>
+            <CardDescription className="text-base pt-1">Nhập tên Đại biểu</CardDescription>
           </CardHeader>
           <CardContent>{renderUserSearch()}</CardContent>
         </Card>

@@ -30,10 +30,10 @@ export const ConfirmationDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-2xl">Xác nhận thông tin điểm danh</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl">Xác nhận thông tin điểm danh</AlertDialogTitle>
         </AlertDialogHeader>
         
-        <div className="space-y-3 p-4 border rounded-md bg-muted/50 text-lg">
+        <div className="space-y-2 p-4 border rounded-md bg-muted/50 text-base">
           <p><strong>Tên Đại Biểu:</strong> {user.name}</p>
           <p><strong>Chức vụ:</strong> {user.position}</p>
           {user.department && user.department !== "N/A" && <p><strong>Phòng ban:</strong> {user.department}</p>}
@@ -41,8 +41,8 @@ export const ConfirmationDialog = ({
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending} className="h-11 px-6 text-base">Hủy</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} disabled={isPending} className="h-11 px-6 text-base">
+          <AlertDialogCancel disabled={isPending}>Hủy</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} disabled={isPending}>
             {isPending ? "Đang xử lý..." : "Điểm Danh"}
           </AlertDialogAction>
         </AlertDialogFooter>
