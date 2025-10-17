@@ -95,9 +95,11 @@ const CheckinPage = () => {
     }
   };
 
-  const { notCheckedInUsers, checkedInUsers, groupedNotCheckedInUsers } = useMemo(() => {
-    const notCheckedIn = users.filter(user => !user.checkin);
-    const checkedIn = users.filter(user => user.checkin);
+  const { checkedInUsers, groupedNotCheckedInUsers } = useMemo(() => {
+    const sortedUsers = [...users].sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+
+    const notCheckedIn = sortedUsers.filter(user => !user.checkin);
+    const checkedIn = sortedUsers.filter(user => user.checkin);
     
     const grouped = notCheckedIn.reduce((acc, user) => {
       const firstLetter = user.name.charAt(0).toUpperCase();
@@ -109,7 +111,6 @@ const CheckinPage = () => {
     }, {} as Record<string, User[]>);
 
     return { 
-      notCheckedInUsers: notCheckedIn, 
       checkedInUsers: checkedIn,
       groupedNotCheckedInUsers: grouped
     };
@@ -144,7 +145,7 @@ const CheckinPage = () => {
             <CommandList>
               <CommandEmpty className="p-4 text-lg">Không tìm thấy Đại biểu.</CommandEmpty>
               
-              {Object.keys(groupedNotCheckedInUsers).sort().map(letter => (
+              {Object.keys(groupedNotCheckedInUsers).sort((a, b) => a.localeCompare(b, 'vi')).map(letter => (
                 <CommandGroup heading={letter} key={letter}>
                   {groupedNotCheckedInUsers[letter].map(user => (
                     <CommandItem key={user.id} value={user.name} onSelect={() => handleUserSelect(user)} className="text-lg py-3">
