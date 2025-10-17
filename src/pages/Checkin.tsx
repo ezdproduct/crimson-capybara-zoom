@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, Terminal } from "lucide-react";
 
@@ -71,6 +71,7 @@ const CheckinPage = () => {
     setSelectedUser(user);
     setIsComboboxOpen(false);
     setSearchValue(""); // Reset search value
+    setIsConfirmDialogOpen(true);
   };
 
   const handleCheckinConfirm = () => {
@@ -94,8 +95,12 @@ const CheckinPage = () => {
     }
   };
 
-  const notCheckedInUsers = users.filter(user => !user.checkin);
-  const checkedInUsers = users.filter(user => user.checkin);
+  // Phân loại người dùng với useMemo để tối ưu hiệu suất
+  const { notCheckedInUsers, checkedInUsers } = useMemo(() => {
+    const notCheckedIn = users.filter(user => !user.checkin);
+    const checkedIn = users.filter(user => user.checkin);
+    return { notCheckedInUsers: notCheckedIn, checkedInUsers: checkedIn };
+  }, [users]); // Chỉ tính toán lại khi danh sách 'users' thay đổi
 
   const commandFilter = (value: string, search: string) => {
     if (normalizeString(value).includes(normalizeString(search))) {
