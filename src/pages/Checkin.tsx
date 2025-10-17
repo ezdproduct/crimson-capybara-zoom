@@ -80,10 +80,13 @@ const CheckinPage = () => {
       return showLoading(`Đang thực hiện điểm danh cho ${selectedUser?.name}...`);
     },
     onSuccess: (_, __, toastId) => {
-      dismissToast(toastId as string | number);
-      setIsConfirmDialogOpen(false);
-      setIsSuccessDialogOpen(true);
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      // Thêm khoảng chờ 5 giây
+      setTimeout(() => {
+        dismissToast(toastId as string | number);
+        setIsConfirmDialogOpen(false);
+        setIsSuccessDialogOpen(true);
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+      }, 5000);
     },
     onError: (error, _, toastId) => {
       if (toastId) dismissToast(toastId as string | number);
