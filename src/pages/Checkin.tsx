@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, Terminal } from "lucide-react";
 
@@ -43,11 +43,36 @@ const CheckinPage = () => {
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const [isFormActive, setIsFormActive] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
   const { data: users = [], isLoading: isLoadingUsers, isError: isFetchError } = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: fetchUsers,
   });
+
+  useEffect(() => {
+    if (users.length > 0) {
+      const searchTerms = normalizeString(searchValue).split(' ').filter(Boolean);
+      
+      if (searchTerms.length === 0) {
+        setFilteredUsers(users);
+        return;
+      }
+
+      const newlyFiltered = users.filter(user => {
+        const normalizedValue = normalizeString(user.name);
+        return searchTerms.every(term => normalizedValue.includes(term));
+      });
+
+      // Chỉ cập nhật nếu có kết quả mới, nếu không giữ lại kết quả cũ
+      if (newlyFiltered.length > 0) {
+        setFilteredUsers(newlyFiltered);
+      } else if (searchValue === "") {
+        setFilteredUsers(users);
+      }
+    }
+  }, [searchValue, users]);
+
 
   const checkinMutation = useMutation({
     mutationFn: performCheckin,
@@ -98,7 +123,7 @@ const CheckinPage = () => {
   const { checkedInUsers, groupedNotCheckedInUsers } = useMemo(() => {
     const getLastName = (fullName: string): string => fullName.split(' ').pop() || '';
 
-    const sortedUsers = [...users].sort((a, b) => {
+    const sortedUsers = [...filteredUsers].sort((a, b) => {
       const lastNameA = getLastName(a.name);
       const lastNameB = getLastName(b.name);
       const compareLast = lastNameA.localeCompare(lastNameB, 'vi');
@@ -127,16 +152,7 @@ const CheckinPage = () => {
       checkedInUsers: checkedIn,
       groupedNotCheckedInUsers: grouped
     };
-  }, [users]);
-
-  const commandFilter = (value: string, search: string) => {
-    const normalizedValue = normalizeString(value);
-    const searchTerms = normalizeString(search).split(' ').filter(Boolean);
-
-    if (searchTerms.length === 0) return 1;
-
-    return searchTerms.every(term => normalizedValue.includes(term)) ? 1 : 0;
-  };
+  }, [filteredUsers]);
 
   const renderName = (fullName: string) => {
     if (searchValue.trim()) {
@@ -175,7 +191,7 @@ const CheckinPage = () => {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-          <Command filter={commandFilter}>
+          <Command>
             <CommandInput placeholder="Tìm tên Đại biểu..." value={searchValue} onValueChange={setSearchValue} className="h-12 text-lg" />
             <CommandList>
               <CommandEmpty />
