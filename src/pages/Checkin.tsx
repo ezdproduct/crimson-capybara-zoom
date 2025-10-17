@@ -196,7 +196,7 @@ const CheckinPage = () => {
             <ChevronsUpDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+        <PopoverContent side="bottom" sideOffset={8} className="w-[--radix-popover-trigger-width] p-0">
           <Command filter={() => 1}>
             <CommandInput placeholder="Tìm tên Đại biểu..." value={searchValue} onValueChange={setSearchValue} className="h-12 text-lg" />
             <CommandList>
