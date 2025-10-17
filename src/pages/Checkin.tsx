@@ -28,12 +28,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { showError, showLoading, dismissToast } from "@/utils/toast";
+import { showError } from "@/utils/toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { User, fetchUsers, performCheckin } from "@/services/checkinService";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { SuccessDialog } from "@/components/SuccessDialog";
 import { Highlight } from "@/components/Highlight";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 
 const CheckinPage = () => {
   const queryClient = useQueryClient();
@@ -44,6 +45,7 @@ const CheckinPage = () => {
   const [isFormActive, setIsFormActive] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const { data: users = [], isLoading: isLoadingUsers, isError: isFetchError } = useQuery<User[]>({
     queryKey: ["users"],
@@ -64,7 +66,6 @@ const CheckinPage = () => {
         return searchTerms.every(term => normalizedValue.includes(term));
       });
 
-      // Chỉ cập nhật nếu có kết quả mới, nếu không giữ lại kết quả cũ
       if (newlyFiltered.length > 0) {
         setFilteredUsers(newlyFiltered);
       } else if (searchValue === "") {
@@ -77,19 +78,18 @@ const CheckinPage = () => {
   const checkinMutation = useMutation({
     mutationFn: performCheckin,
     onMutate: () => {
-      return showLoading(`Đang thực hiện điểm danh cho ${selectedUser?.name}...`);
+      setIsProcessing(true);
     },
-    onSuccess: (_, __, toastId) => {
-      // Thêm khoảng chờ 5 giây
+    onSuccess: () => {
       setTimeout(() => {
-        dismissToast(toastId as string | number);
+        setIsProcessing(false);
         setIsConfirmDialogOpen(false);
         setIsSuccessDialogOpen(true);
         queryClient.invalidateQueries({ queryKey: ["users"] });
       }, 5000);
     },
-    onError: (error, _, toastId) => {
-      if (toastId) dismissToast(toastId as string | number);
+    onError: (error) => {
+      setIsProcessing(false);
       console.error("Failed to submit check-in:", error);
       showError("Điểm danh thất bại. Vui lòng thử lại.");
     },
@@ -232,17 +232,20 @@ const CheckinPage = () => {
   };
 
   return (
-    <div className={cn("w-full px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out", isFormActive ? "pt-16 md:pt-24" : "pt-[30vh]")}>
-      <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">
-        <CardHeader>
-          <CardTitle className="text-3xl">Điểm Danh</CardTitle>
-          <CardDescription className="text-lg pt-1">Nhập tên Đại biểu</CardDescription>
-        </CardHeader>
-        <CardContent>{renderUserSearch()}</CardContent>
-      </Card>
-      <ConfirmationDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen} user={selectedUser} onConfirm={handleCheckinConfirm} isPending={checkinMutation.isPending} />
-      <SuccessDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen} user={selectedUser} onClose={handleSuccessDialogClose} />
-    </div>
+    <>
+      <LoadingOverlay show={isProcessing} message="Đang xử lý..." />
+      <div className={cn("w-full px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out", isFormActive ? "pt-16 md:pt-24" : "pt-[30vh]")}>
+        <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle className="text-3xl">Điểm Danh</CardTitle>
+            <CardDescription className="text-lg pt-1">Nhập tên Đại biểu</CardDescription>
+          </CardHeader>
+          <CardContent>{renderUserSearch()}</CardContent>
+        </Card>
+        <ConfirmationDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen} user={selectedUser} onConfirm={handleCheckinConfirm} isPending={isProcessing} />
+        <SuccessDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen} user={selectedUser} onClose={handleSuccessDialogClose} />
+      </div>
+    </>
   );
 };
 
