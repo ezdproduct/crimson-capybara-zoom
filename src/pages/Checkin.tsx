@@ -50,6 +50,7 @@ const CheckinPage = () => {
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
+        // Cập nhật URL GET tại đây
         const response = await fetch("https://n8n.probase.tech/webhook/checkin");
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -84,6 +85,7 @@ const CheckinPage = () => {
     const toastId = showLoading("Đang thực hiện check-in...");
 
     try {
+      // URL POST vẫn giữ nguyên là webhook-test/checkin
       const response = await fetch("https://n8n.probase.tech/webhook-test/checkin", {
         method: "POST",
         headers: {
