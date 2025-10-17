@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, Terminal } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, normalizeString } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -92,6 +92,13 @@ const CheckinPage = () => {
   const notCheckedInUsers = users.filter(user => !user.checkin);
   const checkedInUsers = users.filter(user => user.checkin);
 
+  const commandFilter = (value: string, search: string) => {
+    if (normalizeString(value).includes(normalizeString(search))) {
+      return 1;
+    }
+    return 0;
+  };
+
   const renderUserSearch = () => {
     if (isLoadingUsers) {
       return <Skeleton className="h-10 w-full" />;
@@ -124,7 +131,7 @@ const CheckinPage = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-            <Command>
+            <Command filter={commandFilter}>
               <CommandInput placeholder="Tìm tên Đại biểu..." />
               <CommandList>
                 <CommandEmpty>Không tìm thấy Đại biểu.</CommandEmpty>
