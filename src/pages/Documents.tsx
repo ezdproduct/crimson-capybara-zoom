@@ -33,7 +33,6 @@ const DocumentsPage = () => {
                   href={doc.path}
                   target="_blank"
                   rel="noopener noreferrer"
-                  download
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
                 >
                   <div className="flex items-center">
