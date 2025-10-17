@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Download } from "lucide-react";
+import { FileText, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const documents = [
   { name: "0. Nội quy đại hội", path: "/documents/00_noi_quy_dai_hoi.docx" },
@@ -29,18 +30,16 @@ const DocumentsPage = () => {
           <ul className="space-y-3">
             {documents.map((doc, index) => (
               <li key={index}>
-                <a
-                  href={doc.path}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to={`/documents/view?path=${doc.path}`}
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
                 >
                   <div className="flex items-center">
                     <FileText className="h-6 w-6 mr-4 text-primary" />
                     <span className="text-lg">{doc.name}</span>
                   </div>
-                  <Download className="h-6 w-6 text-muted-foreground" />
-                </a>
+                  <Eye className="h-6 w-6 text-muted-foreground" />
+                </Link>
               </li>
             ))}
           </ul>
