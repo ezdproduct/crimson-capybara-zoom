@@ -50,7 +50,7 @@ const CheckinPage = () => {
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("https://n8n.probase.tech/webhook-test/checkin");
+        const response = await fetch("https://n8n.probase.tech/webhook/checkin");
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
