@@ -175,7 +175,7 @@ const CheckinPage = () => {
 
   return (
     <div className={cn(
-      "container mx-auto px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out",
+      "w-full px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out",
       isFormActive ? "pt-16 md:pt-24" : "pt-[30vh]"
     )}>
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">

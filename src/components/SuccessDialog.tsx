@@ -27,8 +27,8 @@ export const SuccessDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader className="flex flex-col items-center text-center">
-          <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-          <AlertDialogTitle className="text-2xl">Điểm Danh Thành Công!</AlertDialogTitle>
+          <CheckCircle2 className="h-12 w-12 sm:h-16 sm:w-16 text-green-500 mb-4" />
+          <AlertDialogTitle className="text-xl sm:text-2xl">Điểm Danh Thành Công!</AlertDialogTitle>
           <AlertDialogDescription className="pt-2">
             Đã xác nhận điểm danh thành công cho <strong>{user?.name}</strong>.
           </AlertDialogDescription>
