@@ -28,13 +28,13 @@ export const SuccessDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader className="flex flex-col items-center text-center">
           <CheckCircle2 className="h-12 w-12 sm:h-16 sm:w-16 text-green-500 mb-4" />
-          <AlertDialogTitle className="text-xl sm:text-2xl">Điểm Danh Thành Công!</AlertDialogTitle>
-          <AlertDialogDescription className="pt-2">
+          <AlertDialogTitle className="text-2xl sm:text-3xl">Điểm Danh Thành Công!</AlertDialogTitle>
+          <AlertDialogDescription className="pt-2 text-lg">
             Đã xác nhận điểm danh thành công cho <strong>{user?.name}</strong>.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="sm:justify-center">
-          <AlertDialogAction onClick={onClose}>
+          <AlertDialogAction onClick={onClose} className="h-11 px-8 text-base">
             Tuyệt vời!
           </AlertDialogAction>
         </AlertDialogFooter>

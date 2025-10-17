@@ -111,7 +111,7 @@ const CheckinPage = () => {
 
   const renderUserSearch = () => {
     if (isLoadingUsers) {
-      return <Skeleton className="h-10 w-full" />;
+      return <Skeleton className="h-12 w-full" />;
     }
 
     if (isFetchError) {
@@ -134,10 +134,10 @@ const CheckinPage = () => {
               variant="outline"
               role="combobox"
               aria-expanded={isComboboxOpen}
-              className="w-full justify-between"
+              className="w-full justify-between text-lg h-12"
             >
               {selectedUser ? selectedUser.name : "Mời nhập tên"}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronsUpDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
@@ -146,9 +146,10 @@ const CheckinPage = () => {
                 placeholder="Tìm tên Đại biểu..." 
                 value={searchValue}
                 onValueChange={setSearchValue}
+                className="h-12 text-lg"
               />
               <CommandList>
-                <CommandEmpty>Không tìm thấy Đại biểu.</CommandEmpty>
+                <CommandEmpty className="p-4 text-lg">Không tìm thấy Đại biểu.</CommandEmpty>
                 
                 {notCheckedInUsers.length > 0 && (
                   <CommandGroup heading="Chưa Điểm Danh">
@@ -157,10 +158,11 @@ const CheckinPage = () => {
                         key={user.id}
                         value={user.name}
                         onSelect={() => handleUserSelect(user)}
+                        className="text-lg py-3"
                       >
                         <Check
                           className={cn(
-                            "mr-2 h-4 w-4",
+                            "mr-3 h-5 w-5",
                             selectedUser?.name === user.name ? "opacity-100" : "opacity-0"
                           )}
                         />
@@ -177,9 +179,9 @@ const CheckinPage = () => {
                         key={user.id}
                         value={user.name}
                         disabled={true}
-                        className="text-muted-foreground"
+                        className="text-muted-foreground text-lg py-3"
                       >
-                        <Check className="mr-2 h-4 w-4" />
+                        <Check className="mr-3 h-5 w-5" />
                         <Highlight text={user.name} highlight={searchValue} />
                       </CommandItem>
                     ))}
@@ -201,8 +203,8 @@ const CheckinPage = () => {
     )}>
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">
         <CardHeader>
-          <CardTitle>Điểm Danh</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-3xl">Điểm Danh</CardTitle>
+          <CardDescription className="text-lg pt-1">
             Nhập tên Đại biểu
           </CardDescription>
         </CardHeader>
