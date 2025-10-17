@@ -23,14 +23,22 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface User {
   id: string;
@@ -45,7 +53,8 @@ interface User {
 const CheckinPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); // State cho Popover (Combobox)
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State cho AlertDialog
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,14 +94,17 @@ const CheckinPage = () => {
     fetchUsers();
   }, []);
 
+  const handleUserSelect = (user: User) => {
+    setSelectedUser(user);
+    setOpen(false); // Đóng combobox
+    setIsDialogOpen(true); // Mở hộp thoại xác nhận
+  };
+
   const handleCheckin = async () => {
-    if (!selectedUser) {
-      showError("Vui lòng chọn một người dùng để check-in.");
-      return;
-    }
+    if (!selectedUser) return;
 
     setIsSubmitting(true);
-    const toastId = showLoading("Đang thực hiện check-in...");
+    const toastId = showLoading(`Đang thực hiện check-in cho ${selectedUser.name}...`);
 
     try {
       // URL POST
@@ -109,6 +121,7 @@ const CheckinPage = () => {
       if (response.ok) {
         showSuccess(`Check-in thành công cho ${selectedUser.name}!`);
         setSelectedUser(null); // Reset form
+        setIsDialogOpen(false); // Đóng hộp thoại
       } else {
         showError("Check-in thất bại. Vui lòng thử lại.");
       }
@@ -171,8 +184,9 @@ const CheckinPage = () => {
                                 const userToSelect = users.find(
                                   (u) => u.name.toLowerCase() === currentValue.toLowerCase()
                                 );
-                                setSelectedUser(userToSelect || null);
-                                setOpen(false);
+                                if (userToSelect) {
+                                  handleUserSelect(userToSelect);
+                                }
                               }}
                             >
                               <Check
@@ -192,51 +206,41 @@ const CheckinPage = () => {
                   </PopoverContent>
                 </Popover>
               </div>
-
-              {selectedUser && (
-                <div className="space-y-3 pt-4 border-t">
-                    <h3 className="font-semibold text-lg">Thông tin người dùng</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="name">Tên</Label>
-                      <Input id="name" value={selectedUser.name} readOnly />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Số điện thoại</Label>
-                      <Input id="phone" value={selectedUser.phone} readOnly />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="position">Chức vụ</Label>
-                    <Input id="position" value={selectedUser.position} readOnly />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="department">Phòng ban</Label>
-                    <Input id="department" value={selectedUser.department} readOnly />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="note">Ghi chú</Label>
-                    <Input id="note" value={selectedUser.note} readOnly />
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </CardContent>
-        <CardFooter>
-          <Button
-            onClick={handleCheckin}
-            disabled={!selectedUser || isSubmitting || isLoading}
-            className="w-full"
-          >
-            {isSubmitting ? "Đang xử lý..." : "Check-in"}
-          </Button>
-        </CardFooter>
       </Card>
+
+      {/* AlertDialog for Check-in Confirmation */}
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận Check-in</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn check-in cho người dùng này không?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          {selectedUser && (
+            <div className="space-y-2 p-4 border rounded-md bg-muted/50">
+              <p><strong>Tên:</strong> {selectedUser.name}</p>
+              <p><strong>Chức vụ:</strong> {selectedUser.position}</p>
+              {selectedUser.department && <p><strong>Phòng ban:</strong> {selectedUser.department}</p>}
+              {selectedUser.note && <p><strong>Ghi chú:</strong> {selectedUser.note}</p>}
+            </div>
+          )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>Hủy</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleCheckin} 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Đang xử lý..." : "Check-in"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
