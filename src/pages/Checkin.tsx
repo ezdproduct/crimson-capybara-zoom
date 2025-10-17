@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, Terminal } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { SuccessDialog } from "@/components/SuccessDialog";
 
 const CheckinPage = () => {
+  const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -55,6 +56,8 @@ const CheckinPage = () => {
       dismissToast(toastId as string | number);
       setIsConfirmDialogOpen(false);
       setIsSuccessDialogOpen(true);
+      // Tải lại danh sách người dùng để cập nhật trạng thái
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (error, _, toastId) => {
       if (toastId) dismissToast(toastId as string | number);
@@ -79,6 +82,10 @@ const CheckinPage = () => {
     setIsSuccessDialogOpen(false);
     setSelectedUser(null);
   };
+
+  // Phân loại người dùng
+  const notCheckedInUsers = users.filter(user => !user.checkin);
+  const checkedInUsers = users.filter(user => user.checkin);
 
   const renderUserSearch = () => {
     if (isLoadingUsers) {
@@ -117,23 +124,43 @@ const CheckinPage = () => {
               <CommandInput placeholder="Tìm tên..." />
               <CommandList>
                 <CommandEmpty>Không tìm thấy người dùng.</CommandEmpty>
-                <CommandGroup>
-                  {users.map((user) => (
-                    <CommandItem
-                      key={user.id}
-                      value={user.name}
-                      onSelect={() => handleUserSelect(user)}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedUser?.name === user.name ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {user.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                
+                {notCheckedInUsers.length > 0 && (
+                  <CommandGroup heading="Chưa Check-in">
+                    {notCheckedInUsers.map((user) => (
+                      <CommandItem
+                        key={user.id}
+                        value={user.name}
+                        onSelect={() => handleUserSelect(user)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedUser?.name === user.name ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {user.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+
+                {checkedInUsers.length > 0 && (
+                  <CommandGroup heading="Đã Check-in">
+                    {checkedInUsers.map((user) => (
+                      <CommandItem
+                        key={user.id}
+                        value={user.name}
+                        disabled={true}
+                        className="text-muted-foreground"
+                      >
+                        <Check className="mr-2 h-4 w-4" />
+                        {user.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+
               </CommandList>
             </Command>
           </PopoverContent>

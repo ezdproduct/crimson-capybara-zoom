@@ -7,6 +7,7 @@ export interface User {
   position: string;
   department: string;
   note: string;
+  checkin: boolean; // Thêm trạng thái check-in
 }
 
 // Hàm API để lấy danh sách người dùng
@@ -28,6 +29,7 @@ export const fetchUsers = async (): Promise<User[]> => {
       position: user.position || user["Chức vụ"] || "N/A",
       department: user.department || "N/A",
       note: user.note || "",
+      checkin: user.Checkin || false, // Lấy trạng thái check-in từ API
     }));
 };
 
