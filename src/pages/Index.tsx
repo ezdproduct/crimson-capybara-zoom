@@ -12,7 +12,7 @@ const Index = () => {
         <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
           Sẵn sàng để bắt đầu check-in.
         </p>
-        <Link to="/checkin">
+        <Link to="/">
           <Button size="lg">Đi đến trang Check-in</Button>
         </Link>
       </div>
