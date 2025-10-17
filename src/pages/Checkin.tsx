@@ -113,10 +113,14 @@ const CheckinPage = () => {
       const lastName = getLastName(user.name);
       if (!lastName) return acc;
       const firstLetter = lastName.charAt(0).toUpperCase();
-      if (!acc[firstLetter]) {
-        acc[firstLetter] = [];
+      
+      // Gom các tên không bắt đầu bằng chữ cái vào nhóm '#'
+      const groupKey = firstLetter.match(/\p{L}/u) ? firstLetter : '#';
+
+      if (!acc[groupKey]) {
+        acc[groupKey] = [];
       }
-      acc[firstLetter].push(user);
+      acc[groupKey].push(user);
       return acc;
     }, {} as Record<string, User[]>);
 
@@ -173,7 +177,11 @@ const CheckinPage = () => {
             <CommandList>
               <CommandEmpty className="p-4 text-lg">Không tìm thấy Đại biểu.</CommandEmpty>
               
-              {Object.keys(groupedNotCheckedInUsers).sort((a, b) => a.localeCompare(b, 'vi')).map(letter => (
+              {Object.keys(groupedNotCheckedInUsers).sort((a, b) => {
+                if (a === '#') return 1; // Đưa nhóm '#' xuống cuối
+                if (b === '#') return -1;
+                return a.localeCompare(b, 'vi');
+              }).map(letter => (
                 <CommandGroup heading={letter} key={letter}>
                   {groupedNotCheckedInUsers[letter].map(user => (
                     <CommandItem key={user.id} value={user.name} onSelect={() => handleUserSelect(user)} className="text-lg py-3">
