@@ -37,6 +37,9 @@ interface User {
   name: string;
   email: string;
   phone: string;
+  position: string; // Chức vụ
+  department: string; // Phòng ban
+  note: string; // Ghi chú
 }
 
 const CheckinPage = () => {
@@ -63,8 +66,11 @@ const CheckinPage = () => {
           .map((user: any) => ({
             id: user.row_number ? String(user.row_number) : user["Họ và tên"],
             name: user["Họ và tên"],
-            email: user.email || "", // Mặc định là rỗng nếu không có email
+            email: user.email || "", 
             phone: user.phone || "N/A",
+            position: user.position || user["Chức vụ"] || "N/A",
+            department: user.department || "N/A",
+            note: user.note || "",
           }));
           
         setUsers(formattedUsers);
@@ -188,19 +194,33 @@ const CheckinPage = () => {
               </div>
 
               {selectedUser && (
-                <div className="space-y-2 pt-4 border-t">
-                    <h3 className="font-semibold">Thông tin người dùng</h3>
-                  <div>
-                    <Label htmlFor="name">Tên</Label>
-                    <Input id="name" value={selectedUser.name} readOnly />
+                <div className="space-y-3 pt-4 border-t">
+                    <h3 className="font-semibold text-lg">Thông tin người dùng</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="name">Tên</Label>
+                      <Input id="name" value={selectedUser.name} readOnly />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Số điện thoại</Label>
+                      <Input id="phone" value={selectedUser.phone} readOnly />
+                    </div>
                   </div>
+
                   <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" value={selectedUser.email} readOnly />
+                    <Label htmlFor="position">Chức vụ</Label>
+                    <Input id="position" value={selectedUser.position} readOnly />
                   </div>
+                  
                   <div>
-                    <Label htmlFor="phone">Số điện thoại</Label>
-                    <Input id="phone" value={selectedUser.phone} readOnly />
+                    <Label htmlFor="department">Phòng ban</Label>
+                    <Input id="department" value={selectedUser.department} readOnly />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="note">Ghi chú</Label>
+                    <Input id="note" value={selectedUser.note} readOnly />
                   </div>
                 </div>
               )}
