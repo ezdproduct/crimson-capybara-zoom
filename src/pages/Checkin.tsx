@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Check, ChevronsUpDown, Terminal } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,99 +40,163 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+// Định nghĩa kiểu dữ liệu User
 interface User {
   id: string;
   name: string;
   email: string;
   phone: string;
-  position: string; // Chức vụ
-  department: string; // Phòng ban
-  note: string; // Ghi chú
+  position: string;
+  department: string;
+  note: string;
 }
 
+// Hàm API để lấy danh sách người dùng
+const fetchUsers = async (): Promise<User[]> => {
+  const response = await fetch("https://n8n.probase.tech/webhook/checkin");
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const data = await response.json();
+  
+  // Lọc và ánh xạ dữ liệu
+  return data
+    .filter((user: any) => user["Họ và tên"])
+    .map((user: any) => ({
+      id: user.row_number ? String(user.row_number) : user["Họ và tên"],
+      name: user["Họ và tên"],
+      email: user.email || "",
+      phone: user.phone || "N/A",
+      position: user.position || user["Chức vụ"] || "N/A",
+      department: user.department || "N/A",
+      note: user.note || "",
+    }));
+};
+
+// Hàm API để thực hiện check-in
+const performCheckin = async (user: User): Promise<Response> => {
+  const response = await fetch("https://n8n.probase.tech/webhook-test/checkin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
+
+  if (!response.ok) {
+    throw new Error("Check-in failed");
+  }
+  return response;
+};
+
 const CheckinPage = () => {
-  const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [open, setOpen] = useState(false); // State cho Popover (Combobox)
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State cho AlertDialog
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComboboxOpen, setIsComboboxOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoading(true);
-        // URL GET
-        const response = await fetch("https://n8n.probase.tech/webhook/checkin");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        
-        // Cập nhật logic ánh xạ dữ liệu dựa trên cấu trúc mới
-        const formattedUsers = data
-          .filter((user: any) => user["Họ và tên"]) // Chỉ lấy những người có tên
-          .map((user: any) => ({
-            id: user.row_number ? String(user.row_number) : user["Họ và tên"],
-            name: user["Họ và tên"],
-            email: user.email || "", 
-            phone: user.phone || "N/A",
-            position: user.position || user["Chức vụ"] || "N/A",
-            department: user.department || "N/A",
-            note: user.note || "",
-          }));
-          
-        setUsers(formattedUsers);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-        showError("Không thể tải danh sách người dùng.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Sử dụng React Query để lấy dữ liệu người dùng
+  const { data: users = [], isLoading: isLoadingUsers, isError: isFetchError } = useQuery<User[]>({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+  });
 
-    fetchUsers();
-  }, []);
+  // Sử dụng React Query để thực hiện check-in
+  const checkinMutation = useMutation({
+    mutationFn: performCheckin,
+    onMutate: () => {
+      return showLoading(`Đang thực hiện check-in cho ${selectedUser?.name}...`);
+    },
+    onSuccess: (_, __, toastId) => {
+      dismissToast(toastId as string | number);
+      showSuccess(`Check-in thành công cho ${selectedUser?.name}!`);
+      setSelectedUser(null);
+      setIsDialogOpen(false);
+    },
+    onError: (error, _, toastId) => {
+      if (toastId) dismissToast(toastId as string | number);
+      console.error("Failed to submit check-in:", error);
+      showError("Check-in thất bại. Vui lòng thử lại.");
+    },
+  });
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
-    setOpen(false); // Đóng combobox
-    setIsDialogOpen(true); // Mở hộp thoại xác nhận
+    setIsComboboxOpen(false);
+    setIsDialogOpen(true);
   };
 
-  const handleCheckin = async () => {
-    if (!selectedUser) return;
-
-    setIsSubmitting(true);
-    const toastId = showLoading(`Đang thực hiện check-in cho ${selectedUser.name}...`);
-
-    try {
-      // URL POST
-      const response = await fetch("https://n8n.probase.tech/webhook-test/checkin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(selectedUser),
-      });
-
-      dismissToast(toastId);
-
-      if (response.ok) {
-        showSuccess(`Check-in thành công cho ${selectedUser.name}!`);
-        setSelectedUser(null); // Reset form
-        setIsDialogOpen(false); // Đóng hộp thoại
-      } else {
-        showError("Check-in thất bại. Vui lòng thử lại.");
-      }
-    } catch (error) {
-      dismissToast(toastId);
-      console.error("Failed to submit check-in:", error);
-      showError("Đã xảy ra lỗi khi gửi dữ liệu.");
-    } finally {
-      setIsSubmitting(false);
+  const handleCheckinConfirm = () => {
+    if (selectedUser) {
+      checkinMutation.mutate(selectedUser);
     }
+  };
+
+  const renderContent = () => {
+    if (isLoadingUsers) {
+      return (
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+        </div>
+      );
+    }
+
+    if (isFetchError) {
+      return (
+        <Alert variant="destructive">
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Lỗi</AlertTitle>
+          <AlertDescription>
+            Không thể tải danh sách người dùng. Vui lòng thử lại sau.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return (
+      <div>
+        <Label htmlFor="user-search">Tìm kiếm người dùng</Label>
+        <Popover open={isComboboxOpen} onOpenChange={setIsComboboxOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={isComboboxOpen}
+              className="w-full justify-between"
+            >
+              {selectedUser ? selectedUser.name : "Chọn người dùng..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+            <Command>
+              <CommandInput placeholder="Tìm tên..." />
+              <CommandList>
+                <CommandEmpty>Không tìm thấy người dùng.</CommandEmpty>
+                <CommandGroup>
+                  {users.map((user) => (
+                    <CommandItem
+                      key={user.id}
+                      value={user.name}
+                      onSelect={() => handleUserSelect(user)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedUser?.name === user.name ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {user.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
   };
 
   return (
@@ -144,74 +209,10 @@ const CheckinPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-8 w-1/3" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-8 w-1/3" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="user-search">Tìm kiếm người dùng</Label>
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={open}
-                      className="w-full justify-between"
-                    >
-                      {selectedUser
-                        ? selectedUser.name
-                        : "Chọn người dùng..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                    <Command>
-                      <CommandInput placeholder="Tìm tên..." />
-                      <CommandList>
-                        <CommandEmpty>Không tìm thấy người dùng.</CommandEmpty>
-                        <CommandGroup>
-                          {users.map((user) => (
-                            <CommandItem
-                              key={user.id}
-                              value={user.name}
-                              onSelect={(currentValue) => {
-                                const userToSelect = users.find(
-                                  (u) => u.name.toLowerCase() === currentValue.toLowerCase()
-                                );
-                                if (userToSelect) {
-                                  handleUserSelect(userToSelect);
-                                }
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  selectedUser?.name === user.name
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {user.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-          )}
+          {renderContent()}
         </CardContent>
       </Card>
 
-      {/* AlertDialog for Check-in Confirmation */}
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -231,12 +232,12 @@ const CheckinPage = () => {
           )}
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Hủy</AlertDialogCancel>
+            <AlertDialogCancel disabled={checkinMutation.isPending}>Hủy</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={handleCheckin} 
-              disabled={isSubmitting}
+              onClick={handleCheckinConfirm} 
+              disabled={checkinMutation.isPending}
             >
-              {isSubmitting ? "Đang xử lý..." : "Check-in"}
+              {checkinMutation.isPending ? "Đang xử lý..." : "Check-in"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
