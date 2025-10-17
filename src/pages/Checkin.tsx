@@ -33,6 +33,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { User, fetchUsers, performCheckin } from "@/services/checkinService";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { SuccessDialog } from "@/components/SuccessDialog";
+import { Highlight } from "@/components/Highlight";
 
 const CheckinPage = () => {
   const queryClient = useQueryClient();
@@ -41,6 +42,7 @@ const CheckinPage = () => {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const [isFormActive, setIsFormActive] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   const { data: users = [], isLoading: isLoadingUsers, isError: isFetchError } = useQuery<User[]>({
     queryKey: ["users"],
@@ -68,7 +70,7 @@ const CheckinPage = () => {
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
     setIsComboboxOpen(false);
-    setIsConfirmDialogOpen(true);
+    setSearchValue(""); // Reset search value
   };
 
   const handleCheckinConfirm = () => {
@@ -86,6 +88,9 @@ const CheckinPage = () => {
     setIsComboboxOpen(open);
     if (open && !isFormActive) {
       setIsFormActive(true);
+    }
+    if (!open) {
+      setSearchValue(""); // Reset search on close
     }
   };
 
@@ -132,7 +137,11 @@ const CheckinPage = () => {
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command filter={commandFilter}>
-              <CommandInput placeholder="Tìm tên Đại biểu..." />
+              <CommandInput 
+                placeholder="Tìm tên Đại biểu..." 
+                value={searchValue}
+                onValueChange={setSearchValue}
+              />
               <CommandList>
                 <CommandEmpty>Không tìm thấy Đại biểu.</CommandEmpty>
                 
@@ -150,7 +159,7 @@ const CheckinPage = () => {
                             selectedUser?.name === user.name ? "opacity-100" : "opacity-0"
                           )}
                         />
-                        {user.name}
+                        <Highlight text={user.name} highlight={searchValue} />
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -166,7 +175,7 @@ const CheckinPage = () => {
                         className="text-muted-foreground"
                       >
                         <Check className="mr-2 h-4 w-4" />
-                        {user.name}
+                        <Highlight text={user.name} highlight={searchValue} />
                       </CommandItem>
                     ))}
                   </CommandGroup>
