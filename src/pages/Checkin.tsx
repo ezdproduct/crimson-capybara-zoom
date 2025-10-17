@@ -40,7 +40,7 @@ const CheckinPage = () => {
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
-  const [isFormActive, setIsFormActive] = useState(false); // Trạng thái mới để điều khiển vị trí
+  const [isFormActive, setIsFormActive] = useState(false);
 
   const { data: users = [], isLoading: isLoadingUsers, isError: isFetchError } = useQuery<User[]>({
     queryKey: ["users"],
@@ -175,10 +175,10 @@ const CheckinPage = () => {
 
   return (
     <div className={cn(
-      "container mx-auto p-4 flex justify-center min-h-screen",
-      isFormActive ? "items-start" : "items-center"
+      "container mx-auto px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out",
+      isFormActive ? "pt-16 md:pt-24" : "pt-[30vh]"
     )}>
-      <Card className="w-full max-w-lg bg-card/80 backdrop-blur-sm transition-all duration-500 ease-in-out">
+      <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Check-in</CardTitle>
           <CardDescription>
