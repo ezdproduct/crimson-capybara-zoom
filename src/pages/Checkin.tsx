@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { Check, ChevronsUpDown, Terminal } from "lucide-react";
 
 import { cn, normalizeString } from "@/lib/utils";
@@ -38,6 +39,7 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 
 const CheckinPage = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -111,6 +113,7 @@ const CheckinPage = () => {
   const handleSuccessDialogClose = () => {
     setIsSuccessDialogOpen(false);
     setSelectedUser(null);
+    navigate("/documents");
   };
 
   const handlePopoverOpenChange = (open: boolean) => {
