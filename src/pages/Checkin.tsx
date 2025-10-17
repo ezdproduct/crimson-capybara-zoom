@@ -106,7 +106,7 @@ const CheckinPage = () => {
 
     return (
       <div>
-        <Label htmlFor="user-search">Tìm kiếm người dùng</Label>
+        <Label htmlFor="user-search">Nhập tên Đại biểu</Label>
         <Popover open={isComboboxOpen} onOpenChange={setIsComboboxOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -115,15 +115,15 @@ const CheckinPage = () => {
               aria-expanded={isComboboxOpen}
               className="w-full justify-between"
             >
-              {selectedUser ? selectedUser.name : "Chọn người dùng..."}
+              {selectedUser ? selectedUser.name : "Chọn Đại biểu..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
-              <CommandInput placeholder="Tìm tên..." />
+              <CommandInput placeholder="Tìm tên Đại biểu..." />
               <CommandList>
-                <CommandEmpty>Không tìm thấy người dùng.</CommandEmpty>
+                <CommandEmpty>Không tìm thấy Đại biểu.</CommandEmpty>
                 
                 {notCheckedInUsers.length > 0 && (
                   <CommandGroup heading="Chưa Check-in">
@@ -175,7 +175,7 @@ const CheckinPage = () => {
         <CardHeader>
           <CardTitle>Check-in</CardTitle>
           <CardDescription>
-            Tìm kiếm và chọn người dùng để thực hiện check-in.
+            Nhập tên Đại biểu
           </CardDescription>
         </CardHeader>
         <CardContent>
