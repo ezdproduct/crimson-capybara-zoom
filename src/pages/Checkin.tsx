@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Check, ChevronsUpDown, Terminal } from "lucide-react";
+import { Check, ChevronsUpDown, Terminal, CheckCircle2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -94,7 +94,8 @@ const performCheckin = async (user: User): Promise<Response> => {
 const CheckinPage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
   // Sử dụng React Query để lấy dữ liệu người dùng
   const { data: users = [], isLoading: isLoadingUsers, isError: isFetchError } = useQuery<User[]>({
@@ -110,9 +111,8 @@ const CheckinPage = () => {
     },
     onSuccess: (_, __, toastId) => {
       dismissToast(toastId as string | number);
-      showSuccess(`Check-in thành công cho ${selectedUser?.name}!`);
-      setSelectedUser(null);
-      setIsDialogOpen(false);
+      setIsConfirmDialogOpen(false);
+      setIsSuccessDialogOpen(true);
     },
     onError: (error, _, toastId) => {
       if (toastId) dismissToast(toastId as string | number);
@@ -124,13 +124,18 @@ const CheckinPage = () => {
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
     setIsComboboxOpen(false);
-    setIsDialogOpen(true);
+    setIsConfirmDialogOpen(true);
   };
 
   const handleCheckinConfirm = () => {
     if (selectedUser) {
       checkinMutation.mutate(selectedUser);
     }
+  };
+
+  const handleSuccessDialogClose = () => {
+    setIsSuccessDialogOpen(false);
+    setSelectedUser(null);
   };
 
   const renderContent = () => {
@@ -213,7 +218,8 @@ const CheckinPage = () => {
         </CardContent>
       </Card>
 
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {/* Confirmation Dialog */}
+      <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Xác nhận Check-in</AlertDialogTitle>
@@ -238,6 +244,24 @@ const CheckinPage = () => {
               disabled={checkinMutation.isPending}
             >
               {checkinMutation.isPending ? "Đang xử lý..." : "Check-in"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Success Dialog */}
+      <AlertDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader className="flex flex-col items-center text-center">
+            <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
+            <AlertDialogTitle className="text-2xl">Check-in Thành Công!</AlertDialogTitle>
+            <AlertDialogDescription className="pt-2">
+              Đã xác nhận check-in thành công cho <strong>{selectedUser?.name}</strong>.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center">
+            <AlertDialogAction onClick={handleSuccessDialogClose}>
+              Tuyệt vời!
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
