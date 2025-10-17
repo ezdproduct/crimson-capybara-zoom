@@ -77,7 +77,7 @@ const fetchUsers = async (): Promise<User[]> => {
 
 // Hàm API để thực hiện check-in
 const performCheckin = async (user: User): Promise<Response> => {
-  const response = await fetch("https://n8n.probase.tech/webhook-test/checkin", {
+  const response = await fetch("https://n8n.probase.tech/webhook/xac-nhan-check-in", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
