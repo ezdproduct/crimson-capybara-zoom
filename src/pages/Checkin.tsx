@@ -171,7 +171,7 @@ const CheckinPage = () => {
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-start min-h-screen">
-      <Card className="w-full max-w-lg">
+      <Card className="w-full max-w-lg bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Check-in</CardTitle>
           <CardDescription>
