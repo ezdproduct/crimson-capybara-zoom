@@ -27,7 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { showError, showLoading, dismissToast } from "@/utils/toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -41,6 +40,7 @@ const CheckinPage = () => {
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [isFormActive, setIsFormActive] = useState(false); // Trạng thái mới để điều khiển vị trí
 
   const { data: users = [], isLoading: isLoadingUsers, isError: isFetchError } = useQuery<User[]>({
     queryKey: ["users"],
@@ -56,7 +56,6 @@ const CheckinPage = () => {
       dismissToast(toastId as string | number);
       setIsConfirmDialogOpen(false);
       setIsSuccessDialogOpen(true);
-      // Tải lại danh sách người dùng để cập nhật trạng thái
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (error, _, toastId) => {
@@ -83,7 +82,13 @@ const CheckinPage = () => {
     setSelectedUser(null);
   };
 
-  // Phân loại người dùng
+  const handlePopoverOpenChange = (open: boolean) => {
+    setIsComboboxOpen(open);
+    if (open && !isFormActive) {
+      setIsFormActive(true);
+    }
+  };
+
   const notCheckedInUsers = users.filter(user => !user.checkin);
   const checkedInUsers = users.filter(user => user.checkin);
 
@@ -106,7 +111,7 @@ const CheckinPage = () => {
 
     return (
       <div>
-        <Popover open={isComboboxOpen} onOpenChange={setIsComboboxOpen}>
+        <Popover open={isComboboxOpen} onOpenChange={handlePopoverOpenChange}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -169,8 +174,11 @@ const CheckinPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 flex justify-center items-start min-h-screen">
-      <Card className="w-full max-w-lg bg-card/80 backdrop-blur-sm">
+    <div className={cn(
+      "container mx-auto p-4 flex justify-center min-h-screen",
+      isFormActive ? "items-start" : "items-center"
+    )}>
+      <Card className="w-full max-w-lg bg-card/80 backdrop-blur-sm transition-all duration-500 ease-in-out">
         <CardHeader>
           <CardTitle>Check-in</CardTitle>
           <CardDescription>
