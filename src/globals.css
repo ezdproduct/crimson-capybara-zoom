@@ -103,11 +103,4 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
   }
-
-  @media (max-width: 768px) {
-    body {
-      background-size: contain;
-      background-color: #013479; /* Fallback color for mobile */
-    }
-  }
 }
