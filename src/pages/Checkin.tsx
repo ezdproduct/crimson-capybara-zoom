@@ -37,6 +37,9 @@ interface User {
   name: string;
   email: string;
   phone: string;
+  position: string; // Chức vụ
+  department: string; // Đơn vị
+  note: string; // Ghi chú
 }
 
 const CheckinPage = () => {
@@ -63,8 +66,11 @@ const CheckinPage = () => {
           .map((user: any) => ({
             id: user.row_number ? String(user.row_number) : user["Họ và tên"],
             name: user["Họ và tên"],
-            email: user.email || "", // Mặc định là rỗng nếu không có email
+            email: user.email || "", 
             phone: user.phone || "N/A",
+            position: user.position || user["Chức vụ"] || "N/A", // Sử dụng 'position' hoặc 'Chức vụ'
+            department: user.department || "N/A",
+            note: user.note || "",
           }));
           
         setUsers(formattedUsers);
@@ -188,20 +194,46 @@ const CheckinPage = () => {
               </div>
 
               {selectedUser && (
-                <div className="space-y-2 pt-4 border-t">
-                    <h3 className="font-semibold">Thông tin người dùng</h3>
+                <div className="space-y-3 pt-4 border-t">
+                    <h3 className="font-semibold text-lg">Thông tin người dùng</h3>
+                  
+                  {/* Tên */}
                   <div>
-                    <Label htmlFor="name">Tên</Label>
+                    <Label htmlFor="name">Họ và tên</Label>
                     <Input id="name" value={selectedUser.name} readOnly />
                   </div>
+                  
+                  {/* Chức vụ */}
                   <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" value={selectedUser.email} readOnly />
+                    <Label htmlFor="position">Chức vụ</Label>
+                    <Input id="position" value={selectedUser.position} readOnly />
                   </div>
+
+                  {/* Đơn vị */}
+                  <div>
+                    <Label htmlFor="department">Đơn vị</Label>
+                    <Input id="department" value={selectedUser.department} readOnly />
+                  </div>
+
+                  {/* Số điện thoại */}
                   <div>
                     <Label htmlFor="phone">Số điện thoại</Label>
                     <Input id="phone" value={selectedUser.phone} readOnly />
                   </div>
+                  
+                  {/* Email */}
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" value={selectedUser.email || "Không có"} readOnly />
+                  </div>
+                  
+                  {/* Ghi chú */}
+                  {selectedUser.note && (
+                    <div>
+                      <Label htmlFor="note">Ghi chú</Label>
+                      <Input id="note" value={selectedUser.note} readOnly />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
