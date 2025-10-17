@@ -50,19 +50,23 @@ const CheckinPage = () => {
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
-        // Cập nhật URL GET tại đây
+        // URL GET
         const response = await fetch("https://n8n.probase.tech/webhook/checkin");
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
-        // Assuming the API returns an array of objects with a 'name' property
-        const formattedUsers = data.map((user: any, index: number) => ({
-          id: user.id || `${index}`,
-          name: user.name || "Unknown Name",
-          email: user.email || "no-email@example.com",
-          phone: user.phone || "N/A",
-        }));
+        
+        // Cập nhật logic ánh xạ dữ liệu dựa trên cấu trúc mới
+        const formattedUsers = data
+          .filter((user: any) => user["Họ và tên"]) // Chỉ lấy những người có tên
+          .map((user: any) => ({
+            id: user.row_number ? String(user.row_number) : user["Họ và tên"],
+            name: user["Họ và tên"],
+            email: user.email || "", // Mặc định là rỗng nếu không có email
+            phone: user.phone || "N/A",
+          }));
+          
         setUsers(formattedUsers);
       } catch (error) {
         console.error("Failed to fetch users:", error);
@@ -85,7 +89,7 @@ const CheckinPage = () => {
     const toastId = showLoading("Đang thực hiện check-in...");
 
     try {
-      // URL POST vẫn giữ nguyên là webhook-test/checkin
+      // URL POST
       const response = await fetch("https://n8n.probase.tech/webhook-test/checkin", {
         method: "POST",
         headers: {
