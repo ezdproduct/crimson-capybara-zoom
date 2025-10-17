@@ -191,7 +191,7 @@ const CheckinPage = () => {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-          <Command>
+          <Command filter={() => 1}>
             <CommandInput placeholder="Tìm tên Đại biểu..." value={searchValue} onValueChange={setSearchValue} className="h-12 text-lg" />
             <CommandList>
               <CommandEmpty />
