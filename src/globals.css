@@ -99,7 +99,7 @@
     @apply bg-background text-foreground;
     background-image: url('/background.svg');
     background-size: cover;
-    background-position: center;
+    background-position: top center;
     background-repeat: no-repeat;
     background-attachment: fixed;
   }
