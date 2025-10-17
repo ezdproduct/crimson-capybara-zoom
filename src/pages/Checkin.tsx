@@ -50,7 +50,7 @@ const CheckinPage = () => {
   const checkinMutation = useMutation({
     mutationFn: performCheckin,
     onMutate: () => {
-      return showLoading(`Đang thực hiện check-in cho ${selectedUser?.name}...`);
+      return showLoading(`Đang thực hiện điểm danh cho ${selectedUser?.name}...`);
     },
     onSuccess: (_, __, toastId) => {
       dismissToast(toastId as string | number);
@@ -61,7 +61,7 @@ const CheckinPage = () => {
     onError: (error, _, toastId) => {
       if (toastId) dismissToast(toastId as string | number);
       console.error("Failed to submit check-in:", error);
-      showError("Check-in thất bại. Vui lòng thử lại.");
+      showError("Điểm danh thất bại. Vui lòng thử lại.");
     },
   });
 
@@ -130,7 +130,7 @@ const CheckinPage = () => {
                 <CommandEmpty>Không tìm thấy Đại biểu.</CommandEmpty>
                 
                 {notCheckedInUsers.length > 0 && (
-                  <CommandGroup heading="Chưa Check-in">
+                  <CommandGroup heading="Chưa Điểm Danh">
                     {notCheckedInUsers.map((user) => (
                       <CommandItem
                         key={user.id}
@@ -150,7 +150,7 @@ const CheckinPage = () => {
                 )}
 
                 {checkedInUsers.length > 0 && (
-                  <CommandGroup heading="Đã Check-in">
+                  <CommandGroup heading="Đã Điểm Danh">
                     {checkedInUsers.map((user) => (
                       <CommandItem
                         key={user.id}
@@ -180,7 +180,7 @@ const CheckinPage = () => {
     )}>
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Check-in</CardTitle>
+          <CardTitle>Điểm Danh</CardTitle>
           <CardDescription>
             Nhập tên Đại biểu
           </CardDescription>

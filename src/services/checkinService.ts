@@ -44,7 +44,7 @@ export const performCheckin = async (user: User): Promise<Response> => {
   });
 
   if (!response.ok) {
-    throw new Error("Check-in failed");
+    throw new Error("Điểm danh thất bại");
   }
   return response;
 };

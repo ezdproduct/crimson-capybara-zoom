@@ -3,7 +3,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -31,23 +30,20 @@ export const ConfirmationDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xác nhận Check-in</AlertDialogTitle>
-          <AlertDialogDescription>
-            Bạn có chắc chắn muốn check-in cho người dùng này không?
-          </AlertDialogDescription>
+          <AlertDialogTitle>Xác nhận thông tin điểm danh</AlertDialogTitle>
         </AlertDialogHeader>
         
         <div className="space-y-2 p-4 border rounded-md bg-muted/50">
-          <p><strong>Tên:</strong> {user.name}</p>
+          <p><strong>Tên Đại Biểu:</strong> {user.name}</p>
           <p><strong>Chức vụ:</strong> {user.position}</p>
-          {user.department && <p><strong>Phòng ban:</strong> {user.department}</p>}
+          {user.department && user.department !== "N/A" && <p><strong>Phòng ban:</strong> {user.department}</p>}
           {user.note && <p><strong>Ghi chú:</strong> {user.note}</p>}
         </div>
 
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isPending}>Hủy</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm} disabled={isPending}>
-            {isPending ? "Đang xử lý..." : "Check-in"}
+            {isPending ? "Đang xử lý..." : "Điểm Danh"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
