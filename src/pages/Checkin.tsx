@@ -96,13 +96,23 @@ const CheckinPage = () => {
   };
 
   const { checkedInUsers, groupedNotCheckedInUsers } = useMemo(() => {
-    const sortedUsers = [...users].sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+    const getLastName = (fullName: string): string => fullName.split(' ').pop() || '';
+
+    const sortedUsers = [...users].sort((a, b) => {
+      const lastNameA = getLastName(a.name);
+      const lastNameB = getLastName(b.name);
+      const compareLast = lastNameA.localeCompare(lastNameB, 'vi');
+      if (compareLast !== 0) return compareLast;
+      return a.name.localeCompare(b.name, 'vi');
+    });
 
     const notCheckedIn = sortedUsers.filter(user => !user.checkin);
     const checkedIn = sortedUsers.filter(user => user.checkin);
     
     const grouped = notCheckedIn.reduce((acc, user) => {
-      const firstLetter = user.name.charAt(0).toUpperCase();
+      const lastName = getLastName(user.name);
+      if (!lastName) return acc;
+      const firstLetter = lastName.charAt(0).toUpperCase();
       if (!acc[firstLetter]) {
         acc[firstLetter] = [];
       }
@@ -119,6 +129,24 @@ const CheckinPage = () => {
   const commandFilter = (value: string, search: string) => {
     if (normalizeString(value).includes(normalizeString(search))) return 1;
     return 0;
+  };
+
+  const renderName = (fullName: string) => {
+    if (searchValue.trim()) {
+      return <Highlight text={fullName} highlight={searchValue} />;
+    }
+    const parts = fullName.split(' ');
+    if (parts.length === 1) {
+      return <strong className="font-bold">{fullName}</strong>;
+    }
+    const lastName = parts.pop() || '';
+    const firstName = parts.join(' ');
+    return (
+      <span>
+        {firstName}{' '}
+        <strong className="font-bold">{lastName}</strong>
+      </span>
+    );
   };
 
   const renderUserSearch = () => {
@@ -150,7 +178,7 @@ const CheckinPage = () => {
                   {groupedNotCheckedInUsers[letter].map(user => (
                     <CommandItem key={user.id} value={user.name} onSelect={() => handleUserSelect(user)} className="text-lg py-3">
                       <Check className={cn("mr-3 h-5 w-5", selectedUser?.name === user.name ? "opacity-100" : "opacity-0")} />
-                      <Highlight text={user.name} highlight={searchValue} />
+                      {renderName(user.name)}
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -161,7 +189,7 @@ const CheckinPage = () => {
                   {checkedInUsers.map(user => (
                     <CommandItem key={user.id} value={user.name} disabled={true} className="text-muted-foreground text-lg py-3">
                       <Check className="mr-3 h-5 w-5" />
-                      <Highlight text={user.name} highlight={searchValue} />
+                      {renderName(user.name)}
                     </CommandItem>
                   ))}
                 </CommandGroup>
