@@ -114,7 +114,6 @@ const CheckinPage = () => {
       if (!lastName) return acc;
       const firstLetter = lastName.charAt(0).toUpperCase();
       
-      // Gom các tên không bắt đầu bằng chữ cái vào nhóm '#'
       const groupKey = firstLetter.match(/\p{L}/u) ? firstLetter : '#';
 
       if (!acc[groupKey]) {
@@ -131,8 +130,12 @@ const CheckinPage = () => {
   }, [users]);
 
   const commandFilter = (value: string, search: string) => {
-    if (normalizeString(value).includes(normalizeString(search))) return 1;
-    return 0;
+    const normalizedValue = normalizeString(value);
+    const searchTerms = normalizeString(search).split(' ').filter(Boolean);
+
+    if (searchTerms.length === 0) return 1;
+
+    return searchTerms.every(term => normalizedValue.includes(term)) ? 1 : 0;
   };
 
   const renderName = (fullName: string) => {
@@ -175,10 +178,10 @@ const CheckinPage = () => {
           <Command filter={commandFilter}>
             <CommandInput placeholder="Tìm tên Đại biểu..." value={searchValue} onValueChange={setSearchValue} className="h-12 text-lg" />
             <CommandList>
-              <CommandEmpty className="p-4 text-lg">Không tìm thấy Đại biểu.</CommandEmpty>
+              <CommandEmpty />
               
               {Object.keys(groupedNotCheckedInUsers).sort((a, b) => {
-                if (a === '#') return 1; // Đưa nhóm '#' xuống cuối
+                if (a === '#') return 1;
                 if (b === '#') return -1;
                 return a.localeCompare(b, 'vi');
               }).map(letter => (
