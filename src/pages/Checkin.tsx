@@ -106,7 +106,6 @@ const CheckinPage = () => {
 
     return (
       <div>
-        <Label htmlFor="user-search">Nhập tên Đại biểu</Label>
         <Popover open={isComboboxOpen} onOpenChange={setIsComboboxOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -115,7 +114,7 @@ const CheckinPage = () => {
               aria-expanded={isComboboxOpen}
               className="w-full justify-between"
             >
-              {selectedUser ? selectedUser.name : "Chọn Đại biểu..."}
+              {selectedUser ? selectedUser.name : "Mời nhập tên"}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
