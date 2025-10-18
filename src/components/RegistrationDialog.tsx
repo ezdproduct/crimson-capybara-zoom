@@ -51,7 +51,7 @@ export const RegistrationDialog = ({ open, onOpenChange, onSuccess }: Registrati
     mutationFn: (newUser: NewUser) => registerUser(newUser),
     onSuccess: (_, variables) => {
       form.reset();
-      onSuccess(variables); // Gửi dữ liệu người dùng mới về
+      onSuccess(variables);
     },
     onError: () => {
       showError("Đăng ký thất bại. Vui lòng thử lại.");
@@ -59,7 +59,8 @@ export const RegistrationDialog = ({ open, onOpenChange, onSuccess }: Registrati
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    mutation.mutate(values);
+    // Sử dụng type assertion vì zodResolver đảm bảo các trường là bắt buộc
+    mutation.mutate(values as NewUser);
   };
 
   return (

@@ -35,7 +35,7 @@ export const SuccessDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter className="sm:justify-center">
           <AlertDialogAction onClick={onClose}>
-            Tra cứu tài liệu đại hội
+            Hoàn tất
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

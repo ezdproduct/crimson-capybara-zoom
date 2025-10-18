@@ -114,15 +114,13 @@ const CheckinPage = () => {
   const handleSuccessDialogClose = () => {
     setIsSuccessDialogOpen(false);
     setSelectedUser(null);
-    navigate("/documents");
   };
 
   const handleImmediateCheckin = (newUser: NewUser) => {
     setIsRegistrationOpen(false);
     
-    // Tạo một đối tượng User tạm thời để hiển thị trong popup thành công
     const tempUser: User = {
-      id: newUser.name, // Dùng tên làm id tạm thời
+      id: newUser.name,
       name: newUser.name,
       position: newUser.position,
       checkin: true,
