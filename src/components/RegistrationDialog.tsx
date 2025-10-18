@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { NewUser, registerUser } from "@/services/checkinService";
-import { showSuccess, showError } from "@/utils/toast";
+import { showError } from "@/utils/toast";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Họ và tên là bắt buộc." }),
@@ -34,7 +34,7 @@ const formSchema = z.object({
 interface RegistrationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (newUser: NewUser) => void;
 }
 
 export const RegistrationDialog = ({ open, onOpenChange, onSuccess }: RegistrationDialogProps) => {
@@ -49,10 +49,9 @@ export const RegistrationDialog = ({ open, onOpenChange, onSuccess }: Registrati
 
   const mutation = useMutation({
     mutationFn: (newUser: NewUser) => registerUser(newUser),
-    onSuccess: () => {
-      showSuccess("Đăng ký thành công!");
+    onSuccess: (_, variables) => {
       form.reset();
-      onSuccess();
+      onSuccess(variables); // Gửi dữ liệu người dùng mới về
     },
     onError: () => {
       showError("Đăng ký thất bại. Vui lòng thử lại.");

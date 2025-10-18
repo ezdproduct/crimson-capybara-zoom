@@ -30,7 +30,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { showError } from "@/utils/toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { User, fetchUsers, performCheckin } from "@/services/checkinService";
+import { User, fetchUsers, performCheckin, NewUser } from "@/services/checkinService";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { SuccessDialog } from "@/components/SuccessDialog";
 import { Highlight } from "@/components/Highlight";
@@ -117,8 +117,23 @@ const CheckinPage = () => {
     navigate("/documents");
   };
 
-  const handleRegistrationSuccess = () => {
+  const handleImmediateCheckin = (newUser: NewUser) => {
     setIsRegistrationOpen(false);
+    
+    // Tạo một đối tượng User tạm thời để hiển thị trong popup thành công
+    const tempUser: User = {
+      id: newUser.name, // Dùng tên làm id tạm thời
+      name: newUser.name,
+      position: newUser.position,
+      checkin: true,
+      email: "",
+      phone: "N/A",
+      department: "N/A",
+      note: "Bổ sung",
+    };
+    
+    setSelectedUser(tempUser);
+    setIsSuccessDialogOpen(true);
     queryClient.invalidateQueries({ queryKey: ["users"] });
   };
 
@@ -256,7 +271,7 @@ const CheckinPage = () => {
         </Card>
         <ConfirmationDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen} user={selectedUser} onConfirm={handleCheckinConfirm} isPending={isProcessing} />
         <SuccessDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen} user={selectedUser} onClose={handleSuccessDialogClose} />
-        <RegistrationDialog open={isRegistrationOpen} onOpenChange={setIsRegistrationOpen} onSuccess={handleRegistrationSuccess} />
+        <RegistrationDialog open={isRegistrationOpen} onOpenChange={setIsRegistrationOpen} onSuccess={handleImmediateCheckin} />
       </div>
     </>
   );
