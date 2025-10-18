@@ -237,7 +237,7 @@ const CheckinPage = () => {
   return (
     <>
       <LoadingOverlay show={isProcessing} message="Đang xử lý..." />
-      <div className={cn("w-full px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out", isFormActive ? "pt-16 md:pt-24" : "pt-[30vh]")}>
+      <div className={cn("w-full px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out", isFormActive ? "pt-12 sm:pt-16 md:pt-24" : "pt-[25vh]")}>
         <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">
           <CardHeader>
             <CardTitle className="text-2xl">Điểm Danh</CardTitle>

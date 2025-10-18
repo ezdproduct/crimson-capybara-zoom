@@ -17,11 +17,11 @@ const documents = [
 
 const DocumentsPage = () => {
   return (
-    <div className="w-full px-4 flex justify-center items-start min-h-screen pt-16 md:pt-24">
+    <div className="w-full px-4 flex justify-center items-start min-h-screen pt-12 sm:pt-16 md:pt-24">
       <Card className="w-full max-w-2xl bg-card/80 backdrop-blur-md">
         <CardHeader>
-          <CardTitle className="text-3xl">Tra cứu tài liệu</CardTitle>
-          <CardDescription className="text-lg pt-1">
+          <CardTitle className="text-2xl sm:text-3xl">Tra cứu tài liệu</CardTitle>
+          <CardDescription className="text-base sm:text-lg pt-1">
             Các tài liệu, văn kiện của Đại hội
           </CardDescription>
         </CardHeader>
@@ -37,7 +37,7 @@ const DocumentsPage = () => {
                 >
                   <div className="flex items-center">
                     <FileText className="h-6 w-6 mr-4 text-primary" />
-                    <span className="text-lg">{doc.name}</span>
+                    <span className="text-base sm:text-lg">{doc.name}</span>
                   </div>
                   <Download className="h-6 w-6 text-muted-foreground" />
                 </a>
