@@ -24,7 +24,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -241,7 +240,6 @@ const CheckinPage = () => {
         <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">
           <CardHeader>
             <CardTitle className="text-2xl">Điểm Danh</CardTitle>
-            <CardDescription className="text-base pt-1">Nhập tên Đại biểu</CardDescription>
           </CardHeader>
           <CardContent>{renderUserSearch()}</CardContent>
         </Card>
