@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Check, ChevronsUpDown, Terminal } from "lucide-react";
+import { Check, ChevronsUpDown, Terminal, UserPlus } from "lucide-react";
 
 import { cn, normalizeString } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { SuccessDialog } from "@/components/SuccessDialog";
 import { Highlight } from "@/components/Highlight";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { RegistrationDialog } from "@/components/RegistrationDialog";
 
 const CheckinPage = () => {
   const queryClient = useQueryClient();
@@ -43,6 +44,7 @@ const CheckinPage = () => {
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [isFormActive, setIsFormActive] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -113,6 +115,11 @@ const CheckinPage = () => {
     setIsSuccessDialogOpen(false);
     setSelectedUser(null);
     navigate("/documents");
+  };
+
+  const handleRegistrationSuccess = () => {
+    setIsRegistrationOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["users"] });
   };
 
   const handlePopoverOpenChange = (open: boolean) => {
@@ -238,13 +245,18 @@ const CheckinPage = () => {
       <LoadingOverlay show={isProcessing} message="Đang xử lý..." />
       <div className={cn("w-full px-4 flex justify-center items-start min-h-screen transition-[padding-top] duration-700 ease-in-out", isFormActive ? "pt-12 sm:pt-16 md:pt-24" : "pt-[25vh]")}>
         <Card className="w-full max-w-md bg-card/80 backdrop-blur-md">
-          <CardHeader>
+          <CardHeader className="flex-row items-center justify-between">
             <CardTitle className="text-2xl">Điểm Danh</CardTitle>
+            <Button variant="secondary" onClick={() => setIsRegistrationOpen(true)}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Nhập bổ sung
+            </Button>
           </CardHeader>
           <CardContent>{renderUserSearch()}</CardContent>
         </Card>
         <ConfirmationDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen} user={selectedUser} onConfirm={handleCheckinConfirm} isPending={isProcessing} />
         <SuccessDialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen} user={selectedUser} onClose={handleSuccessDialogClose} />
+        <RegistrationDialog open={isRegistrationOpen} onOpenChange={setIsRegistrationOpen} onSuccess={handleRegistrationSuccess} />
       </div>
     </>
   );
