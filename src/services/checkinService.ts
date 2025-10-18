@@ -58,12 +58,20 @@ export const performCheckin = async (user: User): Promise<Response> => {
 
 // Hàm API để đăng ký người dùng mới
 export const registerUser = async (newUser: NewUser): Promise<Response> => {
+  const payload = [
+    {
+      "Họ và tên": newUser.name,
+      "Chức vụ": newUser.position,
+      "Giới Tính": newUser.gender,
+    },
+  ];
+
   const response = await fetch("https://n8n.probase.tech/webhook/dang-ky", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(newUser),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
